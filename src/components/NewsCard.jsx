@@ -1,22 +1,25 @@
-export default function NewsCard({ article, onClick }) {
+// src/components/NewsCard.jsx
+function NewsCard({ article, onClick }) {
   return (
-    <div 
-      onClick={onClick} 
+    <div
+      onClick={onClick}
       style={{
-        border: '1px solid #ccc',
-        margin: '10px',
-        padding: '10px',
-        cursor: 'pointer',
-        borderRadius: '5px'
+        border: "1px solid #ccc",
+        padding: "10px",
+        margin: "10px",
+        cursor: "pointer",
       }}
     >
-      <img 
-        src={article.urlToImage || "https://via.placeholder.com/400x200"} 
-        alt={article.title} 
-        style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '5px' }}
-      />
+      {article.urlToImage && (
+        <img src={article.urlToImage} alt={article.title} width="200" />
+      )}
       <h3>{article.title}</h3>
-      <p>{article.source.name} - {new Date(article.publishedAt).toLocaleDateString()}</p>
+      <p>
+        {article.source?.name} -{" "}
+        {new Date(article.publishedAt).toLocaleDateString()}
+      </p>
     </div>
   );
 }
+
+export default NewsCard;

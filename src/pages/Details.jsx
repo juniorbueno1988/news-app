@@ -1,18 +1,36 @@
-export default function Details({ article }) {
-  if (!article) return <p>Notícia não encontrada.</p>;
+// src/pages/Details.jsx
+import { useLocation, useNavigate } from "react-router-dom";
+
+function Details() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const article = location.state?.article;
+
+  if (!article) {
+    return (
+      <div>
+        <h2>Nenhuma notícia encontrada</h2>
+        <button onClick={() => navigate("/")}>Voltar</button>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div>
+      <button onClick={() => navigate("/")}>⬅ Voltar</button>
       <h1>{article.title}</h1>
-      <img 
-        src={article.urlToImage || "https://via.placeholder.com/600x300"} 
-        alt={article.title} 
-        style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '5px' }}
-      />
-      <p>{article.content || article.description || "Sem resumo disponível."}</p>
+      {article.urlToImage && (
+        <img src={article.urlToImage} alt={article.title} width="600" />
+      )}
+      <p><strong>Fonte:</strong> {article.source?.name}</p>
+      <p><strong>Publicado em:</strong> {new Date(article.publishedAt).toLocaleString()}</p>
+      <p>{article.description}</p>
+      <p>{article.content}</p>
       <a href={article.url} target="_blank" rel="noopener noreferrer">
-        Ler notícia completa
+        Leia a notícia completa
       </a>
     </div>
   );
 }
+
+export default Details;

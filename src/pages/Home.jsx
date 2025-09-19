@@ -1,88 +1,52 @@
-import React, { useEffect, useState } from "react";
+// src/pages/Home.jsx
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { fetchNews } from "../services/api";
+import NewsCard from "../components/NewsCard";
 
 function Home() {
   const [articles, setArticles] = useState([]);
-  const [search, setSearch] = useState(""); // estado para guardar o termo da busca
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
-  // função que faz a busca
-  const fetchNews = async (query = "") => {
-    try {
-      let url = "";
-      if (query) {
-        // se tiver termo de busca, usa tudo como query
-        url = `https://newsapi.org/v2/everything?q=${query}&apiKey=f522b6fe8a334415981877a88c069b91`;
-      } else {
-        // senão, pega as principais do Brasil
-        url = `https://newsapi.org/v2/top-headlines?country=br&apiKey=f522b6fe8a334415981877a88c069b91`;
-      }
-
-      const response = await fetch(url);
-      const data = await response.json();
-      setArticles(data.articles || []);
-    } catch (error) {
-      console.error("Erro ao buscar notícias:", error);
-    }
-  };
-
-  // carrega as manchetes ao abrir a página
   useEffect(() => {
-    fetchNews();
+    loadNews();
   }, []);
 
-  // função para lidar com envio da busca
+  const loadNews = async (query = "") => {
+    const data = await fetchNews(query);
+    setArticles(data);
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchNews(search);
+    loadNews(search);
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       <h1>App de Notícias</h1>
 
-      {/* Campo de busca */}
-      <form onSubmit={handleSearch} style={{ marginBottom: "20px" }}>
+      <form onSubmit={handleSearch}>
         <input
           type="text"
           placeholder="Buscar notícias..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ padding: "8px", width: "250px" }}
         />
-        <button type="submit" style={{ padding: "8px 12px", marginLeft: "8px" }}>
-          Buscar
-        </button>
+        <button type="submit">Buscar</button>
       </form>
 
-      {/* Lista de notícias */}
-      {articles.length > 0 ? (
+      {articles && articles.length > 0 ? (
         articles.map((article, index) => (
-          <div
+          <NewsCard
             key={index}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              marginBottom: "10px",
-              borderRadius: "8px",
-            }}
-          >
-            <h2>{article.title}</h2>
-            <p>{article.description}</p>
-            {article.urlToImage && (
-              <img
-                src={article.urlToImage}
-                alt={article.title}
-                style={{ width: "100%", maxWidth: "400px" }}
-              />
-            )}
-            <p>
-              <a href={article.url} target="_blank" rel="noopener noreferrer">
-                Leia mais
-              </a>
-            </p>
-          </div>
+            article={article}
+            onClick={() => navigate(`/details/${index}`, { state: { article } })}
+          />
         ))
       ) : (
-        <p>Nenhuma notícia encontrada.</p>
+        <p>Carregando ou nenhuma notícia encontrada...</p>
       )}
     </div>
   );
