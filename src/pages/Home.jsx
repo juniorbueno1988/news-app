@@ -7,6 +7,11 @@ import NewsCard from "../components/NewsCard";
 function Home() {
   const [articles, setArticles] = useState([]);
   const [search, setSearch] = useState("");
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem("favorites");
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +26,17 @@ function Home() {
   const handleSearch = (e) => {
     e.preventDefault();
     loadNews(search);
+  };
+
+  const toggleFavorite = (article) => {
+    let updated = [];
+    if (favorites.some((fav) => fav.url === article.url)) {
+      updated = favorites.filter((fav) => fav.url !== article.url);
+    } else {
+      updated = [...favorites, article];
+    }
+    setFavorites(updated);
+    localStorage.setItem("favorites", JSON.stringify(updated));
   };
 
   return (
@@ -42,7 +58,11 @@ function Home() {
           <NewsCard
             key={index}
             article={article}
-            onClick={() => navigate(`/details/${index}`, { state: { article } })}
+            onClick={() =>
+              navigate(`/details/${index}`, { state: { article } })
+            }
+            onFavorite={toggleFavorite}
+            isFavorite={favorites.some((fav) => fav.url === article.url)}
           />
         ))
       ) : (

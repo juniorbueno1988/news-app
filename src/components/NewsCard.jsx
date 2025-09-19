@@ -1,5 +1,5 @@
 // src/components/NewsCard.jsx
-function NewsCard({ article, onClick }) {
+function NewsCard({ article, onClick, onFavorite, isFavorite }) {
   return (
     <div
       onClick={onClick}
@@ -18,6 +18,15 @@ function NewsCard({ article, onClick }) {
         {article.source?.name} -{" "}
         {new Date(article.publishedAt).toLocaleDateString()}
       </p>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation(); // evita abrir o detalhe
+          onFavorite(article);
+        }}
+      >
+        {isFavorite ? "★ Favorito" : "☆ Favoritar"}
+      </button>
     </div>
   );
 }
