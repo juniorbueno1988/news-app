@@ -43,6 +43,8 @@ function Home() {
     <div>
       <h1>App de Notícias</h1>
 
+      <button onClick={() => navigate("/favorites")}>Ver Favoritos</button>
+
       <form onSubmit={handleSearch}>
         <input
           type="text"
