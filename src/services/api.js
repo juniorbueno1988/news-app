@@ -1,16 +1,5 @@
-const API_KEY = "f522b6fe8a334415981877a88c069b91";
-const BASE_TOP = "https://newsapi.org/v2/top-headlines";
-const BASE_EVERYTHING = "https://newsapi.org/v2/everything";
-
-const VALID_CATEGORIES = [
-  "business",
-  "entertainment",
-  "general",
-  "health",
-  "science",
-  "sports",
-  "technology",
-];
+const API_KEY = "95f6c084b4c599694783f18e07402380";
+const BASE_URL = "https://gnews.io/api/v4/top-headlines";
 
 // Mock de notícias caso API falhe
 const MOCK_NEWS = [
@@ -26,24 +15,25 @@ const MOCK_NEWS = [
 
 export async function fetchNews(query = "", category = "", page = 1) {
   try {
-    let url = "";
+    let url = `${BASE_URL}?lang=pt&country=br&max=10&page=${page}&token=${API_KEY}`;
 
-    if (query) {
-      url = `${BASE_EVERYTHING}?q=${encodeURIComponent(
-        query
-      )}&pageSize=10&page=${page}&apiKey=${API_KEY}`;
-    } else {
-      const catParam = VALID_CATEGORIES.includes(category)
-        ? `&category=${category}`
-        : "";
-      url = `${BASE_TOP}?country=br${catParam}&pageSize=10&page=${page}&apiKey=${API_KEY}`;
-    }
+    if (query) url += `&q=${encodeURIComponent(query)}`;
+    if (category) url += `&topic=${category}`;
 
     const res = await fetch(url);
     const data = await res.json();
 
-    if (data.status !== "ok" || !data.articles) return MOCK_NEWS;
-    return data.articles;
+    if (!data.articles || data.articles.length === 0) return MOCK_NEWS;
+
+    // Ajuste para compatibilidade com estrutura da NewsAPI
+    return data.articles.map((a) => ({
+      title: a.title,
+      source: { name: a.source.name },
+      publishedAt: a.publishedAt,
+      url: a.url,
+      urlToImage: a.image,
+      description: a.description,
+    }));
   } catch (err) {
     console.error("Erro ao buscar notícias:", err);
     return MOCK_NEWS;

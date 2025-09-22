@@ -22,9 +22,10 @@ export default function Home() {
     "technology",
   ];
 
-  // Buscar notícias sempre que mudar query, categoria ou página
+  // Buscar notícias sempre que query, categoria ou página mudar
   useEffect(() => {
     setLoading(true);
+    // Se houver query, ignorar categoria
     fetchNews(query, query ? "" : category, page).then((data) => {
       if (page === 1) setArticles(data);
       else setArticles((prev) => [...prev, ...data]);
@@ -32,6 +33,7 @@ export default function Home() {
     });
   }, [query, category, page]);
 
+  // Adicionar ou remover favorito
   function toggleFavorite(article) {
     let updated;
     if (favorites.some((fav) => fav.url === article.url)) {
